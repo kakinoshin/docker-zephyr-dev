@@ -1,5 +1,9 @@
 FROM ubuntu:16.04
 
+# proxy settings if necessary for apt-get
+ENV http_proxy http://proxy.example.com:8080/
+ENV https_proxy http://proxy.example.com:8080/
+
 # build base envirnonment
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y upgrade
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
@@ -14,6 +18,16 @@ USER root
 ADD /sudoers.txt /etc/sudoers
 RUN chmod 440 /etc/sudoers
 RUN mkdir -p /opt/zephyr
+
+# for proxy environment
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q corkscrew
+USER zephyr
+RUN git config --global http.proxy http://proxy.example.com:8080
+RUN git config --global https.proxy http://proxy.example.com:8080
+RUN git config --global core.gitproxy "proxy-cmd.sh"
+USER root
+ADD /proxy-cmd.sh.txt /usr/local/bin/proxy-cmd.sh
+RUN chmod +x /usr/local/bin/proxy-cmd.sh
 
 # install Zephyr SDK
 USER zephyr

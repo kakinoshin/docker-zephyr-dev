@@ -1,0 +1,4 @@
+#!/bin/bash
+CORKSCREW=`which corkscrew`
+$CORKSCREW proxy.example.com 8080 $1 $2
+
